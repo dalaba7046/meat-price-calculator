@@ -160,35 +160,31 @@
       <h2 class="text-xs font-bold tracking-widest text-gray-500 uppercase">身價分級系統</h2>
       <div class="space-y-2 text-sm">
         <div class="price-card p-3 flex items-start gap-3">
-          <span class="text-xl">🐂</span>
+          <span class="text-xl">✨</span>
           <div>
             <span class="font-bold text-yellow-300">頂級牛馬</span>
-            <span class="text-gray-500 ml-2 text-xs">≥ 牛價</span>
-            <p class="text-gray-400 text-xs mt-0.5">你的肉身價值超越牛肉，是勞動市場的稀有部位。</p>
+            <p class="text-gray-400 text-xs mt-0.5">買車是為了上班，上班是為了還車貸，吃的苦中苦，服侍人上人。</p>
           </div>
         </div>
         <div class="price-card p-3 flex items-start gap-3">
-          <span class="text-xl">🐎</span>
+          <span class="text-xl">🐂</span>
           <div>
-            <span class="font-bold text-purple-400">一般牛馬</span>
-            <span class="text-gray-500 ml-2 text-xs">豬價 ~ 牛價</span>
-            <p class="text-gray-400 text-xs mt-0.5">介於豬牛之間，是撐起這個社會的普通骨幹。</p>
+            <span class="font-bold text-yellow-400">普通牛馬</span>
+            <p class="text-gray-400 text-xs mt-0.5">生活對我反覆捶打，肉質竟變得Q彈勁道。</p>
           </div>
         </div>
         <div class="price-card p-3 flex items-start gap-3">
           <span class="text-xl">🐕</span>
           <div>
-            <span class="font-bold text-pink-400">豬狗</span>
-            <span class="text-gray-500 ml-2 text-xs">豬價 × 0.5 ~ 豬價</span>
-            <p class="text-gray-400 text-xs mt-0.5">你的勞動力比豬肉還便宜，建議重新投胎或轉職。</p>
+            <span class="font-bold text-pink-400">豬狗等級</span>
+            <p class="text-gray-400 text-xs mt-0.5">老闆喜歡用低薪請我 我會讓他知道便宜沒好貨。</p>
           </div>
         </div>
         <div class="price-card p-3 flex items-start gap-3">
           <span class="text-xl">💀</span>
           <div>
             <span class="font-bold text-gray-500">豬狗不如</span>
-            <span class="text-gray-500 ml-2 text-xs">&lt; 豬價 × 0.5</span>
-            <p class="text-gray-400 text-xs mt-0.5">系統已斷氣。你的身價連滷肉飯裡的碎肉都買不起。</p>
+            <p class="text-gray-400 text-xs mt-0.5">你的身價連當豬都不夠格，建議重新投胎或轉職。</p>
           </div>
         </div>
       </div>
@@ -274,25 +270,25 @@
 
       // 等級判斷
       let tier;
-      if (valuePerJin >= beefPrice) {
+      if (valuePerJin > beefPrice * 1.5) {
         tier = {
-          icon: '🐂', name: '頂級牛馬', cssClass: 'tier-wagyu',
-          desc: '你的肉身價值超越牛肉，是勞動市場的稀有部位。',
+          icon: '✨', name: '頂級牛馬', cssClass: 'tier-wagyu',
+          desc: '買車是為了上班，上班是為了還車貸，吃的苦中苦，服侍人上人。',
+        };
+      } else if (valuePerJin >= beefPrice) {
+        tier = {
+          icon: '🐂', name: '普通牛馬', cssClass: 'tier-goodcow',
+          desc: '生活對我反覆捶打，肉質竟變得Q彈勁道。',
         };
       } else if (valuePerJin >= pigPrice) {
         tier = {
-          icon: '🐎', name: '一般牛馬', cssClass: 'tier-goodcow',
-          desc: '介於豬牛之間，是撐起這個社會的普通骨幹。',
-        };
-      } else if (valuePerJin >= pigPrice * 0.5) {
-        tier = {
-          icon: '🐕', name: '豬狗', cssClass: 'tier-dog',
-          desc: '你的勞動力比豬肉還便宜，建議重新投胎或轉職。',
+          icon: '🐕', name: '豬狗等級', cssClass: 'tier-dog',
+          desc: '老闆喜歡用低薪請我 我會讓他知道便宜沒好貨。',
         };
       } else {
         tier = {
           icon: '💀', name: '豬狗不如', cssClass: 'tier-dead',
-          desc: '系統已斷氣。你的身價連滷肉飯裡的碎肉都買不起。',
+          desc: '你的身價連當豬都不夠格，建議重新投胎或轉職。',
         };
       }
 
