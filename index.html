@@ -225,26 +225,29 @@
         const res  = await fetch('data/prices.json?v=' + Date.now());
         const data = await res.json();
 
-        pigPrice  = data.pig.price_per_jin;
-        beefPrice = data.beef.price_per_jin;
+        // 相容新舊兩種 JSON 格式
+        pigPrice  = data.wholesale ? data.wholesale.pig  : data.pig.price_per_jin;
+        beefPrice = data.wholesale ? data.wholesale.beef : data.beef.price_per_jin;
 
         document.getElementById('pig-price').textContent  = pigPrice.toFixed(1);
         document.getElementById('beef-price').textContent = beefPrice.toFixed(1);
 
         // 新鮮度
-        const dateEl   = document.getElementById('data-date');
-        const dataDate = new Date(data.last_updated || data.date);
-        const today    = new Date();
-        const diffDays = Math.floor((today - dataDate) / 86400000);
+        const dateEl    = document.getElementById('data-date');
+        const dateStr   = data.last_updated || data.date || '';
+        const dataDate  = new Date(dateStr);
+        const today     = new Date();
+        const diffDays  = Math.floor((today - dataDate) / 86400000);
+        const displayDate = dateStr.slice(0, 10);
 
         if (diffDays === 0) {
-          dateEl.textContent = `資料日期：${data.date}（今日）`;
+          dateEl.textContent = `資料日期：${displayDate}（今日）`;
           dateEl.className = 'data-freshness fresh text-right';
         } else if (diffDays <= 3) {
-          dateEl.textContent = `資料日期：${data.date}（${diffDays} 天前）`;
+          dateEl.textContent = `資料日期：${displayDate}（${diffDays} 天前）`;
           dateEl.className = 'data-freshness stale text-right';
         } else {
-          dateEl.textContent = `資料日期：${data.date}（可能已過期）`;
+          dateEl.textContent = `資料日期：${displayDate}（可能已過期）`;
           dateEl.className = 'data-freshness text-right text-red-700';
         }
       } catch (e) {
