@@ -38,7 +38,7 @@
           <div class="text-2xl font-black text-red-400" id="pig-price">
             <div class="skeleton w-16">&nbsp;</div>
           </div>
-          <div class="text-xs text-gray-600">元 / 台斤</div>
+          <div class="text-xs text-gray-600">元 / kg</div>
         </div>
         <!-- 牛肉 -->
         <div class="price-card beef-card p-4">
@@ -47,7 +47,7 @@
           <div class="text-2xl font-black text-yellow-400" id="beef-price">
             <div class="skeleton w-16">&nbsp;</div>
           </div>
-          <div class="text-xs text-gray-600">元 / 台斤</div>
+          <div class="text-xs text-gray-600">元 / kg</div>
         </div>
       </div>
       <p class="data-freshness text-right" id="data-date">載入中...</p>
@@ -66,7 +66,7 @@
           placeholder="例：70"
           min="1" max="300" step="0.1"
         />
-        <p class="text-xs text-gray-600" id="weight-jin">&nbsp;</p>
+        <p class="text-xs text-gray-600" id="weight-jin" class="hidden">&nbsp;</p>
       </div>
 
       <div class="space-y-1">
@@ -101,7 +101,7 @@
         <!-- 數據明細 -->
         <div class="space-y-0">
           <div class="data-row">
-            <span class="data-label">體重台斤</span>
+            <span class="data-label">體重</span>
             <span class="data-value" id="res-jin">—</span>
           </div>
           <div class="data-row">
@@ -258,12 +258,7 @@
     document.getElementById('input-weight').addEventListener('input', function () {
       const kg  = parseFloat(this.value);
       const el  = document.getElementById('weight-jin');
-      if (!isNaN(kg) && kg > 0) {
-        const jin = (kg * 1.667).toFixed(1);
-        el.textContent = `≈ ${jin} 台斤`;
-      } else {
-        el.textContent = '\u00a0'; // nbsp
-      }
+      el.textContent = '\u00a0';
     });
 
     // ─── 主計算邏輯 ──────────────────────────────────────────────
@@ -280,8 +275,7 @@
         return;
       }
 
-      const jin         = weight * 1.667;        // 台斤
-      const valuePerJin = salary / jin;           // 單斤身價
+      const valuePerJin = salary / weight;         // 元/kg 身價
 
       const vsRatioPig  = valuePerJin / pigPrice;
       const vsRatioBeef = valuePerJin / beefPrice;
@@ -295,13 +289,13 @@
         };
       } else if (valuePerJin >= beefPrice) {
         tier = {
-          icon: '🐂', name: '溫體好牛', cssClass: 'tier-goodcow',
+          icon: '🐂', name: '溫體牛', cssClass: 'tier-goodcow',
           desc: '身價穩定，是社會的中流砥柱，值得被溫柔對待。',
         };
       } else if (valuePerJin >= pigPrice) {
         tier = {
           icon: '🐎', name: '社會牛馬', cssClass: 'tier-horse',
-          desc: '雖然辛苦，但好歹是個撐起市場的要角。',
+          desc: '。',
         };
       } else if (valuePerJin >= pigPrice * 0.5) {
         tier = {
@@ -311,7 +305,7 @@
       } else {
         tier = {
           icon: '💀', name: '豬狗不如', cssClass: 'tier-dead',
-          desc: '系統已斷氣。你的身價連滷肉飯裡的碎肉都買不起。',
+          desc: '你的身價連當豬都不夠格。',
         };
       }
 
@@ -322,8 +316,8 @@
       tierNameEl.className = `tier-name ${tier.cssClass}`;
       document.getElementById('tier-desc').textContent = tier.desc;
 
-      document.getElementById('res-jin').textContent    = jin.toFixed(1) + ' 台斤';
-      document.getElementById('res-value').textContent  = 'NT$ ' + valuePerJin.toFixed(2) + ' / 台斤';
+      document.getElementById('res-jin').textContent    = weight.toFixed(1) + ' kg';
+      document.getElementById('res-value').textContent  = 'NT$ ' + valuePerJin.toFixed(2) + ' / kg';
 
       const pigSign  = vsRatioPig  >= 1 ? '+' : '';
       const beefSign = vsRatioBeef >= 1 ? '+' : '';
@@ -341,7 +335,7 @@
       section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       // 儲存結果供分享
-      window._lastResult = { weight, jin, valuePerJin, tier, vsRatioPig, vsRatioBeef };
+      window._lastResult = { weight, valuePerJin, tier, vsRatioPig, vsRatioBeef };
     }
 
     // ─── 視覺化定位條 ────────────────────────────────────────────
@@ -377,13 +371,13 @@
       if (!r) return;
       const text =
         `🥩 肉身價值計算機\n` +
-        `體重：${r.weight} kg（${r.jin.toFixed(1)} 台斤）\n` +
-        `單斤身價：NT$ ${r.valuePerJin.toFixed(2)}\n` +
+        `體重：${r.weight} kg\n` +
+        `單公斤身價：NT$ ${r.valuePerJin.toFixed(2)}\n` +
         `${r.tier.icon} 等級：${r.tier.name}\n` +
         `${r.tier.desc}\n` +
         `─\n` +
-        `豬肉：${pigPrice} 元/台斤（你是豬的 ${(r.vsRatioPig).toFixed(2)} 倍）\n` +
-        `牛肉：${beefPrice} 元/台斤（你是牛的 ${(r.vsRatioBeef).toFixed(2)} 倍）`;
+        `豬肉：${pigPrice} 元/kg（你是豬的 ${(r.vsRatioPig).toFixed(2)} 倍）\n` +
+        `牛肉：${beefPrice} 元/kg（你是牛的 ${(r.vsRatioBeef).toFixed(2)} 倍）`;
 
       navigator.clipboard.writeText(text).then(() => {
         const msg = document.getElementById('copy-msg');

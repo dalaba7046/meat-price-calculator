@@ -53,17 +53,13 @@ def main():
     pork_kg = get_pig_price_kg()
     beef_kg = get_beef_price_kg()
     
-    # 換算台斤 (1kg = 1.667台斤)
-    pork_jin = round(pork_kg / 1.667, 2)
-    beef_jin = round(beef_kg / 1.667, 2)
-
     # 建立多來源 JSON 結構
     data = {
         "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "wholesale": {
-            "pig": pork_jin,
-            "beef": beef_jin,
-            "unit": "NTD/台斤"
+            "pig": round(pork_kg, 2),
+            "beef": round(beef_kg, 2),
+            "unit": "NTD/kg"
         },
         "reference_retail": {
             "pork_normal": 150,     # 一般豬肉零售
