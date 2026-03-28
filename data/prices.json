@@ -1,9 +1,9 @@
 {
-    "last_updated": "2026-03-28 14:37",
+    "last_updated": "2026-03-28 23:15",
     "wholesale": {
-        "pig": 47.51,
-        "beef": 113.38,
-        "unit": "NTD/台斤"
+        "pig": 79.2,
+        "beef": 189.0,
+        "unit": "NTD/kg"
     },
     "reference_retail": {
         "pork_normal": 150,
