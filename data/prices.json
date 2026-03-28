@@ -1,14 +1,18 @@
 {
-    "date": "2026-03-28",
-    "pig": {
-        "price_per_jin": 47.51,
-        "unit": "元/台斤",
-        "source": "中央畜產會 毛豬批發行情"
+    "last_updated": "2026-03-28 14:37",
+    "wholesale": {
+        "pig": 47.51,
+        "beef": 113.38,
+        "unit": "NTD/台斤"
     },
-    "beef": {
-        "price_per_jin": 113.38,
-        "unit": "元/台斤",
-        "source": "中央畜產會 肉牛交易行情"
+    "reference_retail": {
+        "pork_normal": 150,
+        "beef_imported": 400,
+        "beef_local": 600,
+        "beef_premium": 1000
     },
-    "last_updated": "2026-03-28T21:29:18.465326"
+    "metadata": {
+        "pork_source": "https://ppg.naif.org.tw",
+        "beef_source": "https://www.naif.org.tw"
+    }
 }
