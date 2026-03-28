@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🥩 肉身價值計算機</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="透過台灣最新豬肉與牛肉批發價，精確計算你的肉身市場等級。" />
+</head>
+<body class="min-h-screen text-white py-8 px-4">
+
+  <div class="max-w-xl mx-auto space-y-6">
+
+    <!-- 標題 -->
+    <header class="text-center space-y-2">
+      <h1 class="text-4xl font-black tracking-tight">
+        🥩 <span class="title-drip">肉身價值</span>計算機
+      </h1>
+      <p class="text-gray-400 text-sm">
+        Meat-Body Value Calculator &nbsp;|&nbsp; 充滿社會惡意的工具
+      </p>
+      <!-- 警語 -->
+      <div class="warning-banner text-xs text-yellow-300 mt-3">
+        ⚠️ 警語：計算結果可能導致職涯焦慮或食慾不振，請斟酌使用。<br/>
+        本工具不儲存任何隱私資料，所有運算皆在瀏覽器完成。
+      </div>
+    </header>
+
+    <!-- 即時肉價 -->
+    <section class="space-y-3">
+      <h2 class="text-xs font-bold tracking-widest text-gray-500 uppercase">今日批發行情</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <!-- 豬肉 -->
+        <div class="price-card pig-card p-4">
+          <div class="text-2xl mb-1">🐷</div>
+          <div class="text-xs text-gray-500 mb-1">毛豬批發</div>
+          <div class="text-2xl font-black text-red-400" id="pig-price">
+            <div class="skeleton w-16">&nbsp;</div>
+          </div>
+          <div class="text-xs text-gray-600">元 / 台斤</div>
+        </div>
+        <!-- 牛肉 -->
+        <div class="price-card beef-card p-4">
+          <div class="text-2xl mb-1">🐄</div>
+          <div class="text-xs text-gray-500 mb-1">肉牛交易</div>
+          <div class="text-2xl font-black text-yellow-400" id="beef-price">
+            <div class="skeleton w-16">&nbsp;</div>
+          </div>
+          <div class="text-xs text-gray-600">元 / 台斤</div>
+        </div>
+      </div>
+      <p class="data-freshness text-right" id="data-date">載入中...</p>
+    </section>
+
+    <!-- 輸入表單 -->
+    <section class="price-card p-5 space-y-4">
+      <h2 class="text-xs font-bold tracking-widest text-gray-500 uppercase">輸入你的資料</h2>
+
+      <div class="space-y-1">
+        <label class="text-sm text-gray-400">體重（公斤 kg）</label>
+        <input
+          id="input-weight"
+          type="number"
+          class="meat-input"
+          placeholder="例：70"
+          min="1" max="300" step="0.1"
+        />
+        <p class="text-xs text-gray-600" id="weight-jin">&nbsp;</p>
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-sm text-gray-400">月薪（新台幣 NTD）</label>
+        <input
+          id="input-salary"
+          type="number"
+          class="meat-input"
+          placeholder="例：35000"
+          min="1" step="100"
+        />
+      </div>
+
+      <button class="calc-btn" id="calc-btn" onclick="calculate()">
+        計算我的肉身價值 💀
+      </button>
+    </section>
+
+    <!-- 結果區塊（預設隱藏） -->
+    <section id="result-section" class="hidden">
+      <div class="result-card space-y-5">
+
+        <!-- 等級 -->
+        <div class="text-center space-y-1">
+          <span class="tier-badge" id="tier-icon">?</span>
+          <div class="tier-name" id="tier-name">—</div>
+          <p class="text-gray-400 text-sm mt-1" id="tier-desc">—</p>
+        </div>
+
+        <hr class="border-white/10" />
+
+        <!-- 數據明細 -->
+        <div class="space-y-0">
+          <div class="data-row">
+            <span class="data-label">體重台斤</span>
+            <span class="data-value" id="res-jin">—</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">月薪</span>
+            <span class="data-value" id="res-salary">—</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">你的單斤身價</span>
+            <span class="data-value text-lg" id="res-value">—</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">vs 豬肉</span>
+            <span class="data-value" id="res-vs-pig">—</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">vs 牛肉</span>
+            <span class="data-value" id="res-vs-beef">—</span>
+          </div>
+        </div>
+
+        <!-- 視覺化比較 -->
+        <div class="space-y-3">
+          <p class="text-xs text-gray-500 uppercase tracking-widest">身價定位圖</p>
+
+          <div>
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>🐷 豬肉 <span id="bar-pig-label">—</span></span>
+              <span>你 <span id="bar-you-label">—</span></span>
+              <span>🐄 牛肉 <span id="bar-beef-label">—</span></span>
+            </div>
+            <div class="relative h-8 bg-[#111] rounded-lg overflow-hidden">
+              <!-- 豬肉位置線 -->
+              <div class="absolute top-0 bottom-0 w-px bg-red-500/60" id="pig-line" style="left:20%"></div>
+              <!-- 牛肉位置線 -->
+              <div class="absolute top-0 bottom-0 w-px bg-yellow-400/60" id="beef-line" style="left:80%"></div>
+              <!-- 你的位置 -->
+              <div
+                class="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white shadow-lg transition-all duration-700"
+                id="you-dot"
+                style="left:50%; transform: translate(-50%, -50%)"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 分享按鈕 -->
+        <button
+          onclick="copyResult()"
+          class="w-full py-2 rounded-lg border border-white/10 text-gray-400 text-sm hover:bg-white/5 transition-colors"
+        >
+          📋 複製結果去炫耀（或哭泣）
+        </button>
+        <p class="text-center text-xs text-gray-700" id="copy-msg">&nbsp;</p>
+
+      </div>
+    </section>
+
+    <!-- 等級說明表 -->
+    <section class="space-y-3">
+      <h2 class="text-xs font-bold tracking-widest text-gray-500 uppercase">身價分級系統</h2>
+      <div class="space-y-2 text-sm">
+        <div class="price-card p-3 flex items-start gap-3">
+          <span class="text-xl">✨</span>
+          <div>
+            <span class="font-bold text-yellow-300">頂級和牛</span>
+            <span class="text-gray-500 ml-2 text-xs">&gt; 牛價 × 1.5</span>
+            <p class="text-gray-400 text-xs mt-0.5">肉界貴族，勞動市場的稀有部位，建案廣告都在等你。</p>
+          </div>
+        </div>
+        <div class="price-card p-3 flex items-start gap-3">
+          <span class="text-xl">🐂</span>
+          <div>
+            <span class="font-bold text-yellow-400">溫體牛</span>
+            <span class="text-gray-500 ml-2 text-xs">牛價 ~ 牛價 × 1.5</span>
+            <p class="text-gray-400 text-xs mt-0.5">身價穩定，是社會的中流砥柱，值得被溫柔對待。</p>
+          </div>
+        </div>
+        <div class="price-card p-3 flex items-start gap-3">
+          <span class="text-xl">🐎</span>
+          <div>
+            <span class="font-bold text-purple-400">社會牛馬</span>
+            <span class="text-gray-500 ml-2 text-xs">豬價 ~ 牛價</span>
+            <p class="text-gray-400 text-xs mt-0.5">雖然辛苦，但好歹是個撐起市場的要角。</p>
+          </div>
+        </div>
+        <div class="price-card p-3 flex items-start gap-3">
+          <span class="text-xl">🐕</span>
+          <div>
+            <span class="font-bold text-pink-400">豬狗等級</span>
+            <span class="text-gray-500 ml-2 text-xs">豬價 × 0.5 ~ 豬價</span>
+            <p class="text-gray-400 text-xs mt-0.5">你的勞動力產出比豬肉還便宜，建議重新投胎或轉職。</p>
+          </div>
+        </div>
+        <div class="price-card p-3 flex items-start gap-3">
+          <span class="text-xl">💀</span>
+          <div>
+            <span class="font-bold text-gray-500">豬狗不如</span>
+            <span class="text-gray-500 ml-2 text-xs">&lt; 豬價 × 0.5</span>
+            <p class="text-gray-400 text-xs mt-0.5">系統已斷氣。你的身價連滷肉飯裡的碎肉都買不起。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-gray-700 pb-4 space-y-1">
+      <p>肉價來源：<a href="https://ppg.naif.org.tw/" target="_blank" class="hover:text-gray-500 transition-colors">中央畜產會</a> &nbsp;|&nbsp; 每日 08:00 自動更新</p>
+      <p>所有計算在瀏覽器完成，本站不儲存任何個人資料</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // ─── 全域狀態 ───────────────────────────────────────────────
+    let pigPrice  = null;
+    let beefPrice = null;
+
+    // ─── 載入肉價 ────────────────────────────────────────────────
+    async function loadPrices() {
+      try {
+        const res  = await fetch('data/prices.json?v=' + Date.now());
+        const data = await res.json();
+
+        pigPrice  = data.pig.price_per_jin;
+        beefPrice = data.beef.price_per_jin;
+
+        document.getElementById('pig-price').textContent  = pigPrice.toFixed(1);
+        document.getElementById('beef-price').textContent = beefPrice.toFixed(1);
+
+        // 新鮮度
+        const dateEl   = document.getElementById('data-date');
+        const dataDate = new Date(data.last_updated || data.date);
+        const today    = new Date();
+        const diffDays = Math.floor((today - dataDate) / 86400000);
+
+        if (diffDays === 0) {
+          dateEl.textContent = `資料日期：${data.date}（今日）`;
+          dateEl.className = 'data-freshness fresh text-right';
+        } else if (diffDays <= 3) {
+          dateEl.textContent = `資料日期：${data.date}（${diffDays} 天前）`;
+          dateEl.className = 'data-freshness stale text-right';
+        } else {
+          dateEl.textContent = `資料日期：${data.date}（可能已過期）`;
+          dateEl.className = 'data-freshness text-right text-red-700';
+        }
+      } catch (e) {
+        console.error('載入肉價失敗：', e);
+        document.getElementById('pig-price').textContent  = '載入失敗';
+        document.getElementById('beef-price').textContent = '載入失敗';
+        document.getElementById('data-date').textContent  = '無法取得最新行情';
+      }
+    }
+
+    // ─── 體重即時換算 ────────────────────────────────────────────
+    document.getElementById('input-weight').addEventListener('input', function () {
+      const kg  = parseFloat(this.value);
+      const el  = document.getElementById('weight-jin');
+      if (!isNaN(kg) && kg > 0) {
+        const jin = (kg * 1.667).toFixed(1);
+        el.textContent = `≈ ${jin} 台斤`;
+      } else {
+        el.textContent = '\u00a0'; // nbsp
+      }
+    });
+
+    // ─── 主計算邏輯 ──────────────────────────────────────────────
+    function calculate() {
+      const weight = parseFloat(document.getElementById('input-weight').value);
+      const salary = parseFloat(document.getElementById('input-salary').value);
+
+      if (!weight || !salary || weight <= 0 || salary <= 0) {
+        alert('請輸入有效的體重與月薪！');
+        return;
+      }
+      if (!pigPrice || !beefPrice) {
+        alert('肉價尚未載入，請稍後再試。');
+        return;
+      }
+
+      const jin         = weight * 1.667;        // 台斤
+      const valuePerJin = salary / jin;           // 單斤身價
+
+      const vsRatioPig  = valuePerJin / pigPrice;
+      const vsRatioBeef = valuePerJin / beefPrice;
+
+      // 等級判斷
+      let tier;
+      if (valuePerJin > beefPrice * 1.5) {
+        tier = {
+          icon: '✨', name: '頂級和牛', cssClass: 'tier-wagyu',
+          desc: '肉界貴族，勞動市場的稀有部位，建案廣告都在等你。',
+        };
+      } else if (valuePerJin >= beefPrice) {
+        tier = {
+          icon: '🐂', name: '溫體好牛', cssClass: 'tier-goodcow',
+          desc: '身價穩定，是社會的中流砥柱，值得被溫柔對待。',
+        };
+      } else if (valuePerJin >= pigPrice) {
+        tier = {
+          icon: '🐎', name: '社會牛馬', cssClass: 'tier-horse',
+          desc: '雖然辛苦，但好歹是個撐起市場的要角。',
+        };
+      } else if (valuePerJin >= pigPrice * 0.5) {
+        tier = {
+          icon: '🐕', name: '豬狗等級', cssClass: 'tier-dog',
+          desc: '你的勞動力產出比豬肉還便宜，建議重新投胎或轉職。',
+        };
+      } else {
+        tier = {
+          icon: '💀', name: '豬狗不如', cssClass: 'tier-dead',
+          desc: '系統已斷氣。你的身價連滷肉飯裡的碎肉都買不起。',
+        };
+      }
+
+      // 更新 DOM
+      const tierNameEl = document.getElementById('tier-name');
+      document.getElementById('tier-icon').textContent = tier.icon;
+      tierNameEl.textContent = tier.name;
+      tierNameEl.className = `tier-name ${tier.cssClass}`;
+      document.getElementById('tier-desc').textContent = tier.desc;
+
+      document.getElementById('res-jin').textContent    = jin.toFixed(1) + ' 台斤';
+      document.getElementById('res-salary').textContent = 'NT$ ' + salary.toLocaleString();
+      document.getElementById('res-value').textContent  = 'NT$ ' + valuePerJin.toFixed(2) + ' / 台斤';
+
+      const pigSign  = vsRatioPig  >= 1 ? '+' : '';
+      const beefSign = vsRatioBeef >= 1 ? '+' : '';
+      document.getElementById('res-vs-pig').textContent  =
+        `${pigSign}${((vsRatioPig - 1) * 100).toFixed(1)}%（豬肉：${pigPrice} 元）`;
+      document.getElementById('res-vs-beef').textContent =
+        `${beefSign}${((vsRatioBeef - 1) * 100).toFixed(1)}%（牛肉：${beefPrice} 元）`;
+
+      // 視覺化定位條
+      updatePositionBar(valuePerJin);
+
+      // 顯示結果
+      const section = document.getElementById('result-section');
+      section.classList.remove('hidden');
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // 儲存結果供分享
+      window._lastResult = { weight, salary, jin, valuePerJin, tier, vsRatioPig, vsRatioBeef };
+    }
+
+    // ─── 視覺化定位條 ────────────────────────────────────────────
+    function updatePositionBar(valuePerJin) {
+      // 範圍：0 ~ 牛價 × 2，超出就截斷
+      const maxVal = beefPrice * 2;
+      const clamp  = v => Math.max(0, Math.min(1, v / maxVal));
+
+      const pigPct  = clamp(pigPrice)  * 100;
+      const beefPct = clamp(beefPrice) * 100;
+      const youPct  = clamp(valuePerJin) * 100;
+
+      document.getElementById('pig-line').style.left   = pigPct + '%';
+      document.getElementById('beef-line').style.left  = beefPct + '%';
+      document.getElementById('you-dot').style.left    = youPct + '%';
+
+      document.getElementById('bar-pig-label').textContent  = pigPrice.toFixed(0);
+      document.getElementById('bar-beef-label').textContent = beefPrice.toFixed(0);
+      document.getElementById('bar-you-label').textContent  = valuePerJin.toFixed(0);
+
+      // 你的位置顏色
+      const dot = document.getElementById('you-dot');
+      if (valuePerJin > beefPrice * 1.5)       dot.style.background = '#ffd700';
+      else if (valuePerJin >= beefPrice)        dot.style.background = '#f7b731';
+      else if (valuePerJin >= pigPrice)         dot.style.background = '#a29bfe';
+      else if (valuePerJin >= pigPrice * 0.5)   dot.style.background = '#fd79a8';
+      else                                       dot.style.background = '#636e72';
+    }
+
+    // ─── 複製結果 ────────────────────────────────────────────────
+    function copyResult() {
+      const r = window._lastResult;
+      if (!r) return;
+      const text =
+        `🥩 肉身價值計算機\n` +
+        `體重：${r.weight} kg（${r.jin.toFixed(1)} 台斤）\n` +
+        `月薪：NT$ ${r.salary.toLocaleString()}\n` +
+        `單斤身價：NT$ ${r.valuePerJin.toFixed(2)}\n` +
+        `${r.tier.icon} 等級：${r.tier.name}\n` +
+        `${r.tier.desc}\n` +
+        `─\n` +
+        `豬肉：${pigPrice} 元/台斤（你是豬的 ${(r.vsRatioPig).toFixed(2)} 倍）\n` +
+        `牛肉：${beefPrice} 元/台斤（你是牛的 ${(r.vsRatioBeef).toFixed(2)} 倍）`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        const msg = document.getElementById('copy-msg');
+        msg.textContent = '已複製！去嗆你朋友吧 🎉';
+        msg.className = 'text-center text-xs text-green-500';
+        setTimeout(() => { msg.textContent = '\u00a0'; }, 3000);
+      });
+    }
+
+    // ─── 初始化 ──────────────────────────────────────────────────
+    loadPrices();
+  </script>
+
+</body>
+</html>
