@@ -105,10 +105,6 @@
             <span class="data-value" id="res-jin">—</span>
           </div>
           <div class="data-row">
-            <span class="data-label">月薪</span>
-            <span class="data-value" id="res-salary">—</span>
-          </div>
-          <div class="data-row">
             <span class="data-label">你的單斤身價</span>
             <span class="data-value text-lg" id="res-value">—</span>
           </div>
@@ -327,7 +323,6 @@
       document.getElementById('tier-desc').textContent = tier.desc;
 
       document.getElementById('res-jin').textContent    = jin.toFixed(1) + ' 台斤';
-      document.getElementById('res-salary').textContent = 'NT$ ' + salary.toLocaleString();
       document.getElementById('res-value').textContent  = 'NT$ ' + valuePerJin.toFixed(2) + ' / 台斤';
 
       const pigSign  = vsRatioPig  >= 1 ? '+' : '';
@@ -346,7 +341,7 @@
       section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       // 儲存結果供分享
-      window._lastResult = { weight, salary, jin, valuePerJin, tier, vsRatioPig, vsRatioBeef };
+      window._lastResult = { weight, jin, valuePerJin, tier, vsRatioPig, vsRatioBeef };
     }
 
     // ─── 視覺化定位條 ────────────────────────────────────────────
@@ -383,7 +378,6 @@
       const text =
         `🥩 肉身價值計算機\n` +
         `體重：${r.weight} kg（${r.jin.toFixed(1)} 台斤）\n` +
-        `月薪：NT$ ${r.salary.toLocaleString()}\n` +
         `單斤身價：NT$ ${r.valuePerJin.toFixed(2)}\n` +
         `${r.tier.icon} 等級：${r.tier.name}\n` +
         `${r.tier.desc}\n` +
