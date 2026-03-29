@@ -323,17 +323,25 @@
 
     // ─── 視覺化定位條 ────────────────────────────────────────────
     function updatePositionBar(valuePerJin) {
-      // 範圍：0 ~ 牛價 × 2，超出就截斷
-      const maxVal = beefPrice * 2;
-      const clamp  = v => Math.max(0, Math.min(1, v / maxVal));
+      // 豬固定在 20%，牛固定在 75%，超出牛價往右推最多到 95%
+      const PIG_POS  = 20;
+      const BEEF_POS = 75;
 
-      const pigPct  = clamp(pigPrice)  * 100;
-      const beefPct = clamp(beefPrice) * 100;
-      const youPct  = clamp(valuePerJin) * 100;
+      let youPct;
+      if (valuePerJin <= pigPrice) {
+        youPct = (valuePerJin / pigPrice) * PIG_POS;
+      } else if (valuePerJin <= beefPrice) {
+        const ratio = (valuePerJin - pigPrice) / (beefPrice - pigPrice);
+        youPct = PIG_POS + ratio * (BEEF_POS - PIG_POS);
+      } else {
+        // 超過牛價：線性推到右側，上限 95%
+        const ratio = Math.min(1, (valuePerJin - beefPrice) / beefPrice);
+        youPct = BEEF_POS + ratio * (95 - BEEF_POS);
+      }
 
-      document.getElementById('pig-line').style.left   = pigPct + '%';
-      document.getElementById('beef-line').style.left  = beefPct + '%';
-      document.getElementById('you-dot').style.left    = youPct + '%';
+      document.getElementById('pig-line').style.left   = PIG_POS + '%';
+      document.getElementById('beef-line').style.left  = BEEF_POS + '%';
+      document.getElementById('you-dot').style.left    = youPct.toFixed(1) + '%';
 
       document.getElementById('bar-pig-label').textContent  = pigPrice.toFixed(0);
       document.getElementById('bar-beef-label').textContent = beefPrice.toFixed(0);
