@@ -123,19 +123,20 @@
           <p class="text-xs text-gray-500 uppercase tracking-widest">身價定位圖</p>
 
           <div>
-            <div class="flex justify-between text-xs text-gray-500 mb-1">
-              <span>🐷 豬肉 <span id="bar-pig-label">—</span></span>
-              <span>你 <span id="bar-you-label">—</span></span>
-              <span>🐄 牛肉 <span id="bar-beef-label">—</span></span>
+            <!-- 標籤層：絕對定位，跟著 line/dot 走 -->
+            <div class="relative h-5 text-xs text-gray-500 mb-1">
+              <span class="absolute -translate-x-1/2 whitespace-nowrap" id="bar-pig-label-wrap" style="left:20%">🐷 <span id="bar-pig-label">—</span></span>
+              <span class="absolute -translate-x-1/2 whitespace-nowrap" id="bar-you-label-wrap" style="left:50%">你 <span id="bar-you-label">—</span></span>
+              <span class="absolute -translate-x-1/2 whitespace-nowrap" id="bar-beef-label-wrap" style="left:75%">🐄 <span id="bar-beef-label">—</span></span>
             </div>
             <div class="relative h-8 bg-[#111] rounded-lg overflow-hidden">
               <!-- 豬肉位置線 -->
               <div class="absolute top-0 bottom-0 w-px bg-red-500/60" id="pig-line" style="left:20%"></div>
               <!-- 牛肉位置線 -->
-              <div class="absolute top-0 bottom-0 w-px bg-yellow-400/60" id="beef-line" style="left:80%"></div>
+              <div class="absolute top-0 bottom-0 w-px bg-yellow-400/60" id="beef-line" style="left:75%"></div>
               <!-- 你的位置 -->
               <div
-                class="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white shadow-lg transition-all duration-700"
+                class="absolute top-1/2 w-4 h-4 rounded-full bg-white shadow-lg transition-all duration-700"
                 id="you-dot"
                 style="left:50%; transform: translate(-50%, -50%)"
               ></div>
@@ -339,9 +340,13 @@
         youPct = BEEF_POS + ratio * (95 - BEEF_POS);
       }
 
-      document.getElementById('pig-line').style.left   = PIG_POS + '%';
-      document.getElementById('beef-line').style.left  = BEEF_POS + '%';
-      document.getElementById('you-dot').style.left    = youPct.toFixed(1) + '%';
+      document.getElementById('pig-line').style.left  = PIG_POS + '%';
+      document.getElementById('beef-line').style.left = BEEF_POS + '%';
+      document.getElementById('you-dot').style.left   = youPct.toFixed(1) + '%';
+
+      document.getElementById('bar-pig-label-wrap').style.left  = PIG_POS + '%';
+      document.getElementById('bar-beef-label-wrap').style.left = BEEF_POS + '%';
+      document.getElementById('bar-you-label-wrap').style.left  = youPct.toFixed(1) + '%';
 
       document.getElementById('bar-pig-label').textContent  = pigPrice.toFixed(0);
       document.getElementById('bar-beef-label').textContent = beefPrice.toFixed(0);
